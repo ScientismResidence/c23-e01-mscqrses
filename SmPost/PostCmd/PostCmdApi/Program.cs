@@ -1,6 +1,7 @@
 using CqrsCore.Domain;
 using CqrsCore.Handler;
 using CqrsCore.Infrastructure;
+using CqrsCore.Producer;
 using PostCmdApi;
 using PostCmdDomain;
 using PostCmdInfrastructure;
@@ -11,7 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services
     .Configure<MongoDbConfig>(builder.Configuration.GetSection(nameof(MongoDbConfig)))
+    .Configure<MessageBrokerConfig>(builder.Configuration.GetSection(nameof(MessageBrokerConfig)))
     .AddScoped<IEventStoreRepository, EventStoreRepository>()
+    .AddScoped<IEventProducer, EventProducer>()
     .AddScoped<IEventStore, EventStore>()
     .AddScoped<IEventSourcingHandler<PostAggregate>, EventSourcingHandler>()
     .AddCommandHandlers()

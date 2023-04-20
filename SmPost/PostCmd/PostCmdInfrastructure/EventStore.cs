@@ -2,6 +2,7 @@
 using CqrsCore.Event;
 using CqrsCore.Exception;
 using CqrsCore.Infrastructure;
+using CqrsCore.Producer;
 using PostCmdDomain;
 
 namespace PostCmdInfrastructure;
@@ -9,10 +10,12 @@ namespace PostCmdInfrastructure;
 public class EventStore : IEventStore
 {
     private readonly IEventStoreRepository _repository;
+    private readonly IEventProducer _producer;
     
-    public EventStore(IEventStoreRepository repository)
+    public EventStore(IEventStoreRepository repository, IEventProducer producer)
     {
         _repository = repository;
+        _producer = producer;
     }
 
     public async Task<List<EventBase>> GetEventsForAggregateAsync(Guid aggregateId)
@@ -52,6 +55,8 @@ public class EventStore : IEventStore
                 Version = ++version,
                 Event = @event
             });
+            
+            await _producer.ProduceAsync(@event);
         }
     }
 }
