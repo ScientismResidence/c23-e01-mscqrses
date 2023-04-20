@@ -104,7 +104,7 @@ public class PostAggregate : AggregateRoot
         _comments.Add(@event.CommentId, new Tuple<string, string>(@event.Author, @event.Message));
     }
 
-    public void EditComment(Guid commentId, string message, string author)
+    public void UpdateComment(Guid commentId, string message, string author)
     {
         if (!IsActive)
         {
