@@ -13,4 +13,6 @@ public class CommentUpdatedEvent : EventBase
     public string Message { get; set; }
     
     public string Author { get; set; }
+    
+    public DateTime UpdatedAt { get; set; }
 }

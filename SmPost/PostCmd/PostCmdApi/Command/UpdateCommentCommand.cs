@@ -2,7 +2,7 @@
 
 namespace PostCmdApi.Command;
 
-public class EditCommentCommand : MessageBase
+public class UpdateCommentCommand : MessageBase
 {
     public Guid CommentId { get; set; }
     
