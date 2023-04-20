@@ -1,17 +1,18 @@
 ﻿using System.Reflection;
+using CqrsCore.Event;
 using CqrsCore.Message;
 
-namespace CqrsCore;
+namespace CqrsCore.Domain;
 
 public class AggregateRoot
 {
-    private readonly List<MessageBase> _events = new();
+    private readonly List<EventBase> _events = new();
     
     public Guid Id { get; protected set; }
 
     public int Version { get; set; } = -1;
     
-    public IEnumerable<MessageBase> GetUncommittedEvents()
+    public IEnumerable<EventBase> GetUncommittedEvents()
     {
         return _events;
     }
@@ -21,15 +22,15 @@ public class AggregateRoot
         _events.Clear();
     }
     
-    public void ReplayEvents(IEnumerable<MessageBase> events)
+    public void ReplayEvents(IEnumerable<EventBase> events)
     {
-        foreach (MessageBase @event in events)
+        foreach (EventBase @event in events)
         {
             ApplyChange(@event, false);
         }
     }
     
-    protected void ApplyChange(MessageBase @event, bool isNew)
+    protected void ApplyChange(EventBase @event, bool isNew)
     {
         MethodInfo method = this.GetType().GetMethod("Apply", new[] { @event.GetType() });
 
@@ -48,7 +49,7 @@ public class AggregateRoot
         }
     }
     
-    protected void RaiseEvent(MessageBase @event)
+    protected void RaiseEvent(EventBase @event)
     {
         ApplyChange(@event, true);
     }

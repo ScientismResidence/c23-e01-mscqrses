@@ -1,4 +1,5 @@
 ﻿using CqrsCore;
+using CqrsCore.Domain;
 using PostCommon.Event;
 
 namespace PostCmdDomain;
