@@ -17,7 +17,7 @@ public class PostRepository : IPostRepository
     {
         PostEntity post = await _context.Posts
             .Include(post => post.Comments)
-            .FirstOrDefaultAsync(post => post.Id == postId);
+            .FirstOrDefaultAsync(post => post.PostId == postId);
 
         return post;
     }
