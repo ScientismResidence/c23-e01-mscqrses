@@ -18,10 +18,10 @@ services:
     volumes:
       - "kafka_data:/bitnami"
     environment:
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_ENABLE_KRAFT=no
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
     depends_on:
       - zookeeper
   mongo:
@@ -38,7 +38,7 @@ services:
     restart: always
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=DevPassword
+      - SA_PASSWORD=DevPassword!
       - MSSQL_PID=Express
 
 volumes:
