@@ -37,7 +37,7 @@ public class EventStore : IEventStore
     {
         List<EventModel> storeEvents = await _repository.FindByAggregateIdAsync(aggregateId);
         
-        if (expectedVersion != -1 || storeEvents[^1].Version != expectedVersion)
+        if (expectedVersion != -1 && storeEvents[^1].Version != expectedVersion)
         {
             throw new ConcurrencyException("Concurrency exception");
         }

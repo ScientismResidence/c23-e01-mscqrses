@@ -7,7 +7,7 @@ namespace PostQueryInfrastructure.Repository;
 public class PostRepository : IPostRepository
 {
     private readonly SocialMediaDbContext _context;
-    
+
     public PostRepository(SocialMediaDbContext context)
     {
         _context = context;
@@ -67,7 +67,7 @@ public class PostRepository : IPostRepository
 
     public async Task CreateAsync(PostEntity post)
     {
-        await _context.Posts.AddAsync(post);
+        _context.Posts.Add(post);
         await _context.SaveChangesAsync();
     }
 

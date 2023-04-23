@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
             .AddSingleton(new SocialMediaDbContextFactory(configureDbContext));
 
         IServiceProvider provider = services.BuildServiceProvider();
-        DbContext context = provider.GetRequiredService<SocialMediaDbContext>();
+        await using DbContext context = provider.GetRequiredService<SocialMediaDbContext>();
 
         await context.Database.EnsureCreatedAsync();
         

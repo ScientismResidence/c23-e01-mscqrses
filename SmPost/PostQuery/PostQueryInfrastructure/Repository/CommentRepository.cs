@@ -22,7 +22,7 @@ public class CommentRepository : ICommentRepository
 
     public async Task CreateAsync(CommentEntity comment)
     {
-        await _context.Comments.AddAsync(comment);
+        _context.Comments.Add(comment);
         await _context.SaveChangesAsync();
     }
 

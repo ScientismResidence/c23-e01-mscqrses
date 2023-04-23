@@ -1,4 +1,5 @@
 using CqrsCore.Consumer;
+using PostCommon.Middleware;
 using PostQueryApi;
 using PostQueryDomain.Repository;
 using PostQueryInfrastructure;
@@ -31,6 +32,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("/", () => "PostQuery service is running...");
+});
 app.Run();

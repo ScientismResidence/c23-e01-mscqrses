@@ -12,7 +12,7 @@ public class AddPostCommandHandler : EventSourcingCommandHandlerBase<AddPostComm
 
     public override async Task HandleAsync(AddPostCommand command)
     {
-        PostAggregate aggregate = new PostAggregate(command.Id, command.Author, command.Author);
+        PostAggregate aggregate = new PostAggregate(command.Id, command.Author, command.Message);
         await EventSourcingHandler.SaveAsync(aggregate);
     }
 }

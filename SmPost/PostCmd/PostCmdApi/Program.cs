@@ -6,6 +6,7 @@ using PostCmdApi;
 using PostCmdDomain;
 using PostCmdInfrastructure;
 using PostCmdInfrastructure.Config;
+using PostCommon.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("/", () => "PostCmd service is running...");
+});
 app.Run();
