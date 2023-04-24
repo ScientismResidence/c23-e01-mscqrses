@@ -10,17 +10,34 @@ namespace PostQueryApi;
 
 public static class ServiceCollectionExtensions
 {
+    private const string MsSqlConnection = "MsSql";
+    private const string PostgresConnection = "Postgres";
+    
     public static async Task<IServiceCollection> AddDatabase(
         this IServiceCollection services, ConfigurationManager configuration)
     {
-        Action<DbContextOptionsBuilder> configureDbContext = (options) =>
-            options
-                .UseLazyLoadingProxies()
-                .UseSqlServer(configuration.GetConnectionString("Default"));
+        void ConfigureDbContext(DbContextOptionsBuilder options)
+        {
+            options.UseLazyLoadingProxies();
+            string connectionString = configuration.GetValue<string>("ConnectionString");
+            switch (connectionString)
+            {
+                case MsSqlConnection:
+                    options.UseSqlServer(configuration.GetConnectionString(MsSqlConnection));
+                    break;
+                case PostgresConnection:
+                    options.UseNpgsql(configuration.GetConnectionString(PostgresConnection));
+                    break;
+                default:
+                    throw new ArgumentException(
+                        "Unsupported database type. " + 
+                        "Specify supported database type in configuration file.");
+            }
+        }
 
         services
-            .AddDbContext<SocialMediaDbContext>(configureDbContext)
-            .AddSingleton(new SocialMediaDbContextFactory(configureDbContext));
+            .AddDbContext<SocialMediaDbContext>((Action<DbContextOptionsBuilder>)ConfigureDbContext)
+            .AddSingleton(new SocialMediaDbContextFactory(ConfigureDbContext));
 
         IServiceProvider provider = services.BuildServiceProvider();
         await using DbContext context = provider.GetRequiredService<SocialMediaDbContext>();

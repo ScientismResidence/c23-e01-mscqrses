@@ -31,7 +31,8 @@ public class PostEventConsumer : IEventConsumer
     {
         try
         {
-            await SaveConsume();
+            IConsumer<string, string> consumer = ConfigureConsumer();
+            await StartConsumptionAsync(consumer);
         }
         catch (Exception exception)
         {
@@ -40,7 +41,7 @@ public class PostEventConsumer : IEventConsumer
         }
     }
 
-    private async Task SaveConsume()
+    private IConsumer<string, string> ConfigureConsumer()
     {
         ConsumerConfig config = new ConsumerConfig
         {
@@ -51,18 +52,28 @@ public class PostEventConsumer : IEventConsumer
             AllowAutoCreateTopics = _config.ConsumerConfig.AllowAutoCreateTopics
         };
 
-        IConsumer<string, string> consumer = new ConsumerBuilder<string, string>(config)
+        ConsumerBuilder<string, string> builder = new ConsumerBuilder<string, string>(config)
             .SetKeyDeserializer(Deserializers.Utf8)
-            .SetValueDeserializer(Deserializers.Utf8)
-            .Build();
-        
-        consumer.Subscribe(_config.TopicName);
+            .SetValueDeserializer(Deserializers.Utf8);
 
         if (_config.ConsumeFromBeginning)
         {
-            SetupConsumingFromBeginning(consumer);
+            builder = builder.SetPartitionsAssignedHandler((_, partitions) =>
+            {
+                return partitions
+                    .Select(partition => new TopicPartitionOffset(partition, Offset.Beginning))
+                    .ToList();
+            });
         }
 
+        IConsumer<string, string> consumer = builder.Build();
+        consumer.Subscribe(_config.TopicName);
+
+        return consumer;
+    }
+
+    private async Task StartConsumptionAsync(IConsumer<string, string> consumer)
+    {
         while (true)
         {
             ConsumeResult<string, string> consumeResult = consumer.Consume();
@@ -94,27 +105,6 @@ public class PostEventConsumer : IEventConsumer
             }
 
             consumer.Commit(consumeResult);
-        }
-    }
-
-    private void SetupConsumingFromBeginning(IConsumer<string, string> consumer)
-    {
-        using var adminClient = new AdminClientBuilder(new AdminClientConfig
-        {
-            BootstrapServers = _config.Hosts
-        }).Build();
-
-        // Get the metadata for the topic
-        Metadata metadata = adminClient.GetMetadata(_config.TopicName, TimeSpan.FromSeconds(5));
-        TopicMetadata topicMetadata = metadata.Topics
-            .First(value => value.Topic == _config.TopicName);
-        
-        // Iterate topic partitions and assign them to the consumer
-        foreach (PartitionMetadata partitionMetadata in topicMetadata.Partitions)
-        {
-            TopicPartitionOffset topicPartitionOffset = new TopicPartitionOffset(
-                _config.TopicName, partitionMetadata.PartitionId, Offset.Beginning);
-            consumer.Assign(topicPartitionOffset);
         }
     }
 }

@@ -45,6 +45,15 @@ services:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=DevPassword!
       - MSSQL_PID=Express
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_PASSWORD=DevPassword!
 
 volumes:
   zookeeper_data:
@@ -56,6 +65,8 @@ volumes:
   mongo_config:
     driver: local
   mssql_data:
+    driver: local
+  postgres_data:
     driver: local
    
 networks:
