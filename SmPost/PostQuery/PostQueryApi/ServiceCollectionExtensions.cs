@@ -1,5 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CqrsCore.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using PostQueryApi.Handler;
+using PostQueryApi.Query;
+using PostQueryDomain.Entity;
 using PostQueryInfrastructure;
+using PostQueryInfrastructure.Dispatcher;
 
 namespace PostQueryApi;
 
@@ -22,6 +27,25 @@ public static class ServiceCollectionExtensions
 
         await context.Database.EnsureCreatedAsync();
         
+        return services;
+    }
+    
+    public static IServiceCollection AddQueryHandlers(this IServiceCollection services)
+    {
+        services.AddScoped<IQueryHandler, QueryHandler>();
+        
+        IServiceProvider provider = services.BuildServiceProvider();
+        IQueryHandler handler = provider.GetRequiredService<IQueryHandler>();
+        
+        var dispatcher = new QueryDispatcher();
+        dispatcher.RegisterHandler<GetAllPostsQuery>(handler.HandleAsync);
+        dispatcher.RegisterHandler<GetPostByIdQuery>(handler.HandleAsync);
+        dispatcher.RegisterHandler<GetPostsByAuthorQuery>(handler.HandleAsync);
+        dispatcher.RegisterHandler<GetPostsWithCommentsQuery>(handler.HandleAsync);
+        dispatcher.RegisterHandler<GetPostsWithLikesQuery>(handler.HandleAsync);
+        
+        services.AddSingleton<IQueryDispatcher<PostEntity>>(dispatcher);
+
         return services;
     }
 }

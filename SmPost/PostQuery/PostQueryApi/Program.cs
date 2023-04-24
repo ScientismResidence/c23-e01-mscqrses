@@ -20,6 +20,7 @@ builder.Services
     .AddScoped<ICommentRepository, CommentRepository>()
     .AddScoped<IPostEventHandler, PostEventHandler>()
     .AddScoped<IEventConsumer, PostEventConsumer>()
+    .AddQueryHandlers()
     .AddHostedService<ConsumerHostedService>()
     .AddControllers();
 
