@@ -11,5 +11,5 @@ public abstract class EventBase : MessageBase
     
     public int Version { get; set; }
     
-    public string Type { get; }
+    public string Type { get; set; }
 }

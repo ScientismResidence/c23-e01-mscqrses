@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services
-    .Configure<MongoDbConfig>(builder.Configuration.GetSection(nameof(MongoDbConfig)))
+    .AddMongoDb(builder.Configuration)
     .Configure<MessageBrokerConfig>(builder.Configuration.GetSection(nameof(MessageBrokerConfig)))
     .AddScoped<IEventStoreRepository, EventStoreRepository>()
     .AddScoped<IEventProducer, EventProducer>()

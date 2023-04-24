@@ -13,7 +13,7 @@ public class AddCommentCommandHandler : EventSourcingCommandHandlerBase<AddComme
     public override async Task HandleAsync(AddCommentCommand command)
     {
         PostAggregate aggregate = await EventSourcingHandler.GetByIdAsync(command.Id);
-        aggregate.AddComment(command.Author, command.Comment);
+        aggregate.AddComment(command.Author, command.Message);
         await EventSourcingHandler.SaveAsync(aggregate);
     }
 }

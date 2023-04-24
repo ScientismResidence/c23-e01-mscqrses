@@ -27,11 +27,11 @@ public class PostEventConsumer : IEventConsumer
         _scopeFactory = scopeFactory;
     }
 
-    public void Consume()
+    public async Task Consume()
     {
         try
         {
-            SaveConsume();
+            await SaveConsume();
         }
         catch (Exception exception)
         {
@@ -40,7 +40,7 @@ public class PostEventConsumer : IEventConsumer
         }
     }
 
-    private void SaveConsume()
+    private async Task SaveConsume()
     {
         ConsumerConfig config = new ConsumerConfig
         {
@@ -84,11 +84,13 @@ public class PostEventConsumer : IEventConsumer
             
             using (var scope = _scopeFactory.CreateScope())
             {
-                IPostEventHandler handler = scope.ServiceProvider.GetRequiredService<PostEventHandler>();
+                IPostEventHandler handler = scope.ServiceProvider.GetRequiredService<IPostEventHandler>();
                 var handlerMethod = handler.GetType()
                     .GetMethod(nameof(IPostEventHandler.On), new Type[] { @event.GetType() });
                 ArgumentNullException.ThrowIfNull(handlerMethod);
-                handlerMethod.Invoke(handler, new object[] { @event });
+                Task result = (Task)handlerMethod.Invoke(handler, new object[] { @event });
+                ArgumentNullException.ThrowIfNull(result);
+                await result;
             }
 
             consumer.Commit(consumeResult);

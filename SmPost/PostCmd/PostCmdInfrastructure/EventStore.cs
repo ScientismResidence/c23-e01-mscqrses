@@ -46,13 +46,14 @@ public class EventStore : IEventStore
         
         foreach (EventBase @event in events)
         {
+            @event.Version = ++version;
             await _repository.SaveAsync(new EventModel
             {
                 AggregateId = aggregateId,
                 AggregateType = nameof(PostAggregate),
                 EventType = @event.GetType().Name,
                 TimeStamp = DateTime.UtcNow,
-                Version = ++version,
+                Version = version,
                 Event = @event
             });
             

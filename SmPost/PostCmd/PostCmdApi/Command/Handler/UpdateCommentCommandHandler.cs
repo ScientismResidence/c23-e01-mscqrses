@@ -13,7 +13,7 @@ public class UpdateCommentCommandHandler: EventSourcingCommandHandlerBase<Update
     public override async Task HandleAsync(UpdateCommentCommand command)
     {
         PostAggregate aggregate = await EventSourcingHandler.GetByIdAsync(command.Id);
-        aggregate.UpdateComment(command.CommentId, command.Comment, command.Author);
+        aggregate.UpdateComment(command.CommentId, command.Message, command.Author);
         await EventSourcingHandler.SaveAsync(aggregate);
     }
 }

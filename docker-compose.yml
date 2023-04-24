@@ -33,11 +33,14 @@ services:
     restart: always
     volumes:
       - "mongo_data:/data/db"
-  sql:
+      - "mongo_config:/data/configdb"
+  mssql:
     image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
     ports:
       - "1433:1433"
     restart: always
+    volumes:
+      - "mssql_data:/var/opt/mssql"
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=DevPassword!
@@ -49,6 +52,10 @@ volumes:
   kafka_data:
     driver: local
   mongo_data:
+    driver: local
+  mongo_config:
+    driver: local
+  mssql_data:
     driver: local
    
 networks:

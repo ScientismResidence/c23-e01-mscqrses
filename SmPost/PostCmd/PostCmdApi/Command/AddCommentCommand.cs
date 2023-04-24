@@ -4,7 +4,7 @@ namespace PostCmdApi.Command;
 
 public class AddCommentCommand : MessageBase
 {
-    public string Comment { get; set; }
+    public string Message { get; set; }
     
     public string Author { get; set; }
 }
